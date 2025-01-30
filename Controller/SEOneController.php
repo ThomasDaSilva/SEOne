@@ -1,0 +1,78 @@
+<?php
+
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace SEOne\Controller;
+
+use Propel\Runtime\Exception\PropelException;
+use SEOne\Form\SeoForm;
+use SEOne\Model\Seone;
+use SEOne\Model\SeoneQuery;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
+use Thelia\Controller\Admin\BaseAdminController;
+use Thelia\Model\LangQuery;
+use Thelia\Tools\URL;
+
+#[Route('/admin/module/seone/seo', name: 'seone_seo', methods: 'POST')]
+class SEOneController extends BaseAdminController
+{
+    /**
+     * @throws PropelException
+     */
+    #[Route('/save', name: '_save', methods: 'POST')]
+    public function saveAction(Request $request): RedirectResponse
+    {
+        $form = $this->createForm(name: SeoForm::getName());
+
+        $seoForm = $this->validateForm($form);
+
+        $object_id = $request->get('object_id');
+        $object_type = $request->get('object_type');
+
+        $lang = LangQuery::create()
+            ->filterById($request->get('lang_id'))
+            ->findOne();
+
+        if (null === $objectSeo = SeoneQuery::create()
+                ->filterByObjectId($object_id)
+                ->filterByObjectType($object_type)
+                ->findOne()
+        ) {
+            $objectSeo = (new Seone())
+                ->setObjectId($object_id)
+                ->setObjectType($object_type);
+        }
+
+        $objectSeo
+            ->setLocale($lang->getLocale())
+            ->setJsonData($seoForm->get('json_data')->getData())
+            ->setNoindex(null === $seoForm->get('noindex_checkbox')->getData() ? 0 : 1)
+            ->setNofollow(null === $seoForm->get('nofollow_checkbox')->getData() ? 0 : 1)
+            ->setH1(null === $seoForm->get('h1')->getData() ? '' : $seoForm->get('h1')->getData());
+
+        for ($i = 1; $i <= 5; ++$i) {
+            \call_user_func([$objectSeo, 'setMeshUrl'.$i], $seoForm->get('mesh_url_'.$i)->getData());
+            \call_user_func([$objectSeo, 'setMeshText'.$i], $seoForm->get('mesh_text_'.$i)->getData());
+            \call_user_func([$objectSeo, 'setMesh'.$i], $seoForm->get('mesh_'.$i)->getData());
+        }
+
+        $objectSeo->save();
+
+        return $this->generateRedirect(
+            URL::getInstance()->absoluteUrl(
+                $request->getSession()->getReturnToUrl(),
+                ['current_tab' => 'seo']
+            )
+        );
+    }
+}

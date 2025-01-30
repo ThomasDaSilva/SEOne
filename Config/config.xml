@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<config xmlns="http://thelia.net/schema/dic/config"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
+    <forms>
+        <form name="seone_form" class="SEOne\Form\SeoForm" />
+    </forms>
+
+    <hooks>
+        <hook id="seone.addfields.hook" class="SEOne\Hook\SeoFormHook">
+            <tag name="hook.event_listener" event="tab-seo.bottom" type="back" method="onTabSeoUpdateForm" />
+        </hook>
+        <hook id="seone.meta.hook" class="SEOne\Hook\MetaHook" scope="request">
+            <tag name="hook.event_listener" event="main.head-bottom" type="front" method="onMainHeadBottom" />
+            <argument type="service" id="request_stack" />
+        </hook>
+        <hook id="seone.seo.update.form" class="SEOne\Hook\SeoUpdateFormHook">
+            <tag name="hook.event_listener" event="tab-seo.update-form" type="backoffice" method="addInputs"/>
+        </hook>
+    </hooks>
+
+</config>
