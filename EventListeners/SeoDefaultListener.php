@@ -1,0 +1,37 @@
+<?php
+
+namespace SEOne\EventListeners;
+
+use SEOne\Event\SEOneSpecificEvents\SEOneMicroDataEvent;
+use SEOne\Event\SEOneSpecificEvents\SEOnePageH1Event;
+use SEOne\Event\SEOneSpecificEvents\SEOnePageTitleEvent;
+use SEOne\Service\SeoManager;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+
+#[AsEventListener(event: SEOnePageTitleEvent::BETTER_SEO_PAGE_TITLE, method: 'getSeoPageTitle', priority: 128)]
+#[AsEventListener(event: SEOnePageH1Event::BETTER_SEO_PAGE_H1, method: 'getSeoPageH1', priority: 128)]
+#[AsEventListener(event: SEOneMicroDataEvent::BETTER_SEO_MICRO_DATA, method: 'getSeoMicroData', priority: 128)]
+readonly class SeoDefaultListener
+{
+    public function __construct(private SeoManager $defaultManager)
+    {
+    }
+
+    public function getSeoPageTitle(SEOnePageTitleEvent $event): void
+    {
+        $title = $this->defaultManager->getSeoPageTitle($event->getViewId(),$event->getView());
+        $event->setTitle($title);
+    }
+
+    public function getSeoPageH1(SEOnePageH1Event $event): void
+    {
+        $title = $this->defaultManager->getSeoPageH1($event->getViewId(),$event->getView());
+        $event->setTitle($title);
+    }
+
+    public function getSeoMicroData(SEOneMicroDataEvent $event): void
+    {
+        $title = $this->defaultManager->getSeoMicroData($event->getViewId(),$event->getView(),$event->getParameters());
+        $event->setTitle($title);
+    }
+}

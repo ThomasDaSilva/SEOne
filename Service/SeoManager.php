@@ -13,64 +13,50 @@
 namespace SEOne\Service;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
-use SEOne\Event\SEOnePageTitleEvent;
+use SEOne\Service\SeoDefaultModels\SeoElementInterface;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Thelia\Model\ConfigQuery;
-use Thelia\Service\Model\LangService;
 
 class SeoManager
 {
-    #[TaggedIterator('seone.type')]
-    private iterable $seoServices;
-
     public function __construct(
-        iterable                           $seoServices,
-        private readonly RequestStack      $requestStack,
-        private readonly LangService       $langService,
+        #[TaggedIterator('seone.type')]
+        private readonly iterable          $seoServices,
         protected EventDispatcherInterface $dispatcher
     )
     {
-        $this->seoServices = $seoServices;
     }
 
-    public function getPageTitle(string $view = null, ?int $identifier = null): ?string
+    public function getSeoPageTitle($id = null, string $view = null): ?string
     {
-        $defaultTitle = ConfigQuery::read('store_name', '');
-
-        $lang = $this->langService->getLang();
-
-        if (!$view ??= $this->requestStack->getCurrentRequest()?->get('_view')) {
-            return $defaultTitle;
-        }
-
-        $seoService = $this->getSeoServiceByView($view);
-        $defaultTitle = $seoService->getPageTitle();
-
-        $pageTitleEvent = new SEOnePageTitleEvent($defaultTitle, $view, $defaultId, $lang->getLocale());
-
-        $this->dispatcher->dispatch(
-            $pageTitleEvent,
-            SEOnePageTitleEvent::BETTER_SEO_PAGE_TITLE);
+        /** @var SeoElementInterface $seoService */
+        $seoService = $this->getSeoServiceByView(view: $view);
+        return $seoService->getSeoPageTitle(id: $id);
     }
 
-    public function getSeoData(string $type): ?SeoElementInterface
+    public function getSeoPageH1($id = null, string $view = null): ?string
     {
-        foreach ($this->seoServices as $service) {
-            if ($service->supports($type)) {
-                return $service;
-            }
-        }
-
-        throw new \Exception("No SEO service found for type: $type");
+        /** @var SeoElementInterface $seoService */
+        $seoService = $this->getSeoServiceByView(view: $view);
+        return $seoService->getSeoPageH1(id: $id, type: $view);
     }
 
-    protected function getSeoServiceByView(string $view): ?SeoElementInterface
+    public function getSeoMicroData($id = null, string $view = null, array $params = []): ?string
     {
-        foreach ($this->seoServices as $seoService) {
+        /** @var SeoElementInterface $seoService */
+        $seoService = $this->getSeoServiceByView(view: $view);
+        return $seoService->getSeoMicroData(id: $id, type: $view, params: $params);
+    }
+
+
+    public function getSeoServiceByView(string $view): ?SeoElementInterface
+    {
+        $seoServicesArray = iterator_to_array($this->seoServices);
+        usort($seoServicesArray, static fn(SeoElementInterface $a, SeoElementInterface $b) => $b->getPriority() <=> $a->getPriority());
+        foreach ($seoServicesArray as $seoService) {
             if ($seoService->supports($view)) {
                 return $seoService;
             }
         }
+        return null;
     }
 }

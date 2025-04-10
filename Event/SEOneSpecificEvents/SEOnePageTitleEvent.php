@@ -1,24 +1,21 @@
 <?php
 
-namespace SEOne\Event;
+namespace SEOne\Event\SEOneSpecificEvents;
 
 use Thelia\Core\Event\ActionEvent;
 
 class SEOnePageTitleEvent extends ActionEvent
 {
-    protected string $title;
+    protected string $title = "";
     protected string $view;
     protected ?int $view_id;
-    protected string $locale;
 
     public const BETTER_SEO_PAGE_TITLE = 'better.seo.page.title';
 
-    public function __construct(string $title, string $view, ?int $view_id, string $locale)
+    public function __construct(string $view, ?int $view_id)
     {
-        $this->title = $title;
         $this->view = $view;
         $this->view_id = $view_id;
-        $this->locale = $locale;
     }
 
     public function getTitle(): string
@@ -26,9 +23,10 @@ class SEOnePageTitleEvent extends ActionEvent
         return $this->title;
     }
 
-    public function setTitle(string $title): void
+    public function setTitle(string $title): SEOnePageTitleEvent
     {
         $this->title = $title;
+        return $this;
     }
 
     public function getView(): string
@@ -36,9 +34,10 @@ class SEOnePageTitleEvent extends ActionEvent
         return $this->view;
     }
 
-    public function setView($view): void
+    public function setView(string $view): SEOnePageTitleEvent
     {
         $this->view = $view;
+        return $this;
     }
 
     public function getViewId(): ?int
@@ -46,18 +45,9 @@ class SEOnePageTitleEvent extends ActionEvent
         return $this->view_id;
     }
 
-    public function setViewId($view_id): void
+    public function setViewId(?int $view_id): SEOnePageTitleEvent
     {
         $this->view_id = $view_id;
-    }
-
-    public function getLocale(): string
-    {
-        return $this->locale;
-    }
-
-    public function setLocale($locale): void
-    {
-        $this->locale = $locale;
+        return $this;
     }
 }
