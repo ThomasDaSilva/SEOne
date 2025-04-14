@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace SEOne;
 
 use Propel\Runtime\Connection\ConnectionInterface;
@@ -13,7 +23,7 @@ class SEOne extends BaseModule
     public const BETTER_SE0_LIMIT_CONFIG_KEY = 'seone_limit';
     public const SEO_CANONICAL_META_KEY = 'seo_canonical_meta';
 
-    public function postActivation(ConnectionInterface $con = null): void
+    public function postActivation(?ConnectionInterface $con = null): void
     {
         if (!self::getConfigValue('is_initialized')) {
             $database = new Database($con);

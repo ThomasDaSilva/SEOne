@@ -76,7 +76,7 @@ readonly class SeoToolsService
         return $microDataEvent->getTitle() ?? '';
     }
 
-    public function getPageId(string $view): string
+    public function getPageId(string $view): ?string
     {
         $key = $view.'_id';
         $type = $this->getRequest()->get($key);
@@ -84,11 +84,12 @@ readonly class SeoToolsService
             return $type;
         }
         $seoService = $this->seoDefaultManager->getSeoServiceByView(view: $view);
+
         if (!$seoService) {
-            return '';
+            return null;
         }
 
-        return $this->getRequest()->get($seoService?->getIdentifier()) ?? '';
+        return $this->getRequest()->get($seoService?->getIdentifier()) ?? null;
     }
 
     public function getPageView(): string

@@ -60,13 +60,18 @@ class SeoManager
     public function getSeoServiceByView(string $view): ?SeoElementInterface
     {
         $seoServicesArray = iterator_to_array($this->seoServices);
+        $defaultSeoService = null;
         usort($seoServicesArray, static fn (SeoElementInterface $a, SeoElementInterface $b) => $b->getPriority() <=> $a->getPriority());
         foreach ($seoServicesArray as $seoService) {
             if ($seoService->supports($view)) {
                 return $seoService;
             }
+
+            if ($seoService->getIdentifier() === 'default') {
+                $defaultSeoService = $seoService;
+            }
         }
 
-        return null;
+        return $defaultSeoService;
     }
 }

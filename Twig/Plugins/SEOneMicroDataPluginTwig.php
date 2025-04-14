@@ -33,9 +33,10 @@ class SEOneMicroDataPluginTwig extends AbstractExtension
         ];
     }
 
-    public function getSeoPageTitle(?string $view = null, ?string $id = null): string
+    public function getSeoPageTitle(?string $view = null, ?int $id = null): string
     {
         $defaultType = $view ?? $this->toolsService->getPageView() ?? '';
+
         $defaultId = $id ?? $this->toolsService->getPageId($defaultType);
 
         return $this->toolsService->getSeoPageTitle(view: $defaultType, view_id: $defaultId);
@@ -55,10 +56,8 @@ class SEOneMicroDataPluginTwig extends AbstractExtension
     public function getSeoPageDesc(?string $view = null, ?string $id = null): string
     {
         $defaultType = $view ?? $this->toolsService->getPageView() ?? '';
+
         $defaultId = $id ?? $this->toolsService->getPageId($defaultType);
-        if (null === $defaultId) {
-            return '';
-        }
 
         return $this->toolsService->getSeoPageDesc(view: $defaultType, view_id: $defaultId);
     }
