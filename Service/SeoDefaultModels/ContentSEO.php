@@ -1,9 +1,20 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace SEOne\Service\SeoDefaultModels;
 
 use SEOne\Model\Map\SeoneI18nTableMap;
 use SEOne\Model\SeoneQuery;
+use SEOne\SEOne;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ContentQuery;
@@ -16,10 +27,9 @@ readonly class ContentSEO implements SeoElementInterface
     use SEOneMicroDataTrait;
 
     public function __construct(
-        LangService              $langService,
+        LangService $langService,
         EventDispatcherInterface $eventDispatcher,
-    )
-    {
+    ) {
         $this->setDependencies(langService: $langService, dispatcher: $eventDispatcher);
     }
 
@@ -49,13 +59,22 @@ readonly class ContentSEO implements SeoElementInterface
         if ($id) {
             $microdata = $this->getContentMicroData($id, $this->langService->getLang());
         }
+
         return $this->getScriptsTag($microdata, $type, $id);
     }
 
     public function getSeoPageTitle($id): string
     {
-        $content = ContentQuery::create()->filterById($id)->useI18nQuery($this->langService->getLocale())->endUse()->findOne();
-        return $content?->getTitle() ?? ConfigQuery::read('store_name') ?? '';
+        $content = ContentQuery::create()->filterById($id)->findOne()->setlocale($this->langService->getLocale());
+
+        return $content?->getMetaTitle() ?? $content?->getTitle() ?? SEOne::getConfigValue('description', ConfigQuery::read('store_description'), $this->langService->getLocale()) ?? '';
+    }
+
+    public function getSeoPageDesc($id): string
+    {
+        $content = ContentQuery::create()->filterById($id)->findOne()->setlocale($this->langService->getLocale());
+
+        return $content?->getMetaDescription() ?? SEOne::getConfigValue('description', ConfigQuery::read('store_description'), $this->langService->getLocale()) ?? '';
     }
 
     public function getSeoPageH1($id, string $type): string
@@ -67,16 +86,16 @@ readonly class ContentSEO implements SeoElementInterface
             ->useSEOneI18nQuery()
             ->filterByLocale($locale)
             ->endUse()
-            ->withColumn(SEOneI18nTableMap::COL_H1, 'h1')
+            ->withColumn(SeoneI18nTableMap::COL_H1, 'h1')
             ->findOne();
 
         if (null !== $query && $query->getVirtualColumn('h1')) {
             return $query->getVirtualColumn('h1');
         }
         $content = ContentQuery::create()->filterById($id)->useI18nQuery($locale)->endUse()->findOne();
+
         return $content?->getTitle() ?? ConfigQuery::read('store_name') ?? '';
     }
-
 
     private function getContentMicroData($contentId, Lang $lang): ?array
     {
@@ -111,5 +130,4 @@ readonly class ContentSEO implements SeoElementInterface
 
         return $microData;
     }
-
 }

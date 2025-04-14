@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace SEOne\Service\SeoDefaultModels;
 
 use Propel\Runtime\Collection\ObjectCollection;
@@ -21,11 +31,10 @@ readonly class CategorySEO implements SeoElementInterface
     use SEOneMicroDataTrait;
 
     public function __construct(
-        LangService              $langService,
+        LangService $langService,
         EventDispatcherInterface $eventDispatcher,
-        private RequestStack     $requestStack,
-    )
-    {
+        private RequestStack $requestStack,
+    ) {
         $this->setDependencies(langService: $langService, dispatcher: $eventDispatcher);
     }
 
@@ -60,13 +69,22 @@ readonly class CategorySEO implements SeoElementInterface
             $category = CategoryQuery::create()->filterById($id)->findOne();
             $microdata = $this->getCategoryMicroData($category, $this->langService->getLang(), $page, $limit);
         }
+
         return $this->getScriptsTag($microdata, $type, $id);
     }
 
     public function getSeoPageTitle($id): string
     {
-        $category = CategoryQuery::create()->filterById($id)->useI18nQuery($this->langService->getLocale())->endUse()->findOne();
-        return $category?->getTitle() ?? ConfigQuery::read('store_name') ?? '';
+        $category = CategoryQuery::create()->filterById($id)->findOne()->setlocale($this->langService->getLocale());
+
+        return $category?->getMetaTitle() ?? $category?->getTitle() ?? SEOne::getConfigValue('description', ConfigQuery::read('store_description'), $this->langService->getLocale()) ?? '';
+    }
+
+    public function getSeoPageDesc($id): string
+    {
+        $category = CategoryQuery::create()->filterById($id)->findOne()->setlocale($this->langService->getLocale());
+
+        return $category?->getMetaDescription() ?? SEOne::getConfigValue('description', ConfigQuery::read('store_description'), $this->langService->getLocale()) ?? '';
     }
 
     public function getSeoPageH1($id, string $type): string
@@ -78,13 +96,14 @@ readonly class CategorySEO implements SeoElementInterface
             ->useSEOneI18nQuery()
             ->filterByLocale($locale)
             ->endUse()
-            ->withColumn(SEOneI18nTableMap::COL_H1, 'h1')
+            ->withColumn(SeoneI18nTableMap::COL_H1, 'h1')
             ->findOne();
 
         if (null !== $query && $query->getVirtualColumn('h1')) {
             return $query->getVirtualColumn('h1');
         }
         $category = CategoryQuery::create()->filterById($id)->useI18nQuery($locale)->endUse()->findOne();
+
         return $category?->getTitle() ?? ConfigQuery::read('store_name') ?? '';
     }
 

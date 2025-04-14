@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace SEOne\Service\SeoDefaultModels;
 
 use SEOne\Event\SEOneMicroDataEvent;
@@ -60,10 +70,10 @@ trait SEOneMicroDataTrait
             ->useSEOneI18nQuery()
             ->filterByLocale($this->langService->getLocale())
             ->endUse()
-            ->withColumn(SEOneI18nTableMap::COL_NOINDEX, 'noindex')
-            ->withColumn(SEOneI18nTableMap::COL_NOFOLLOW, 'nofollow')
-            ->withColumn(SEOneI18nTableMap::COL_H1, 'h1')
-            ->withColumn(SEOneI18nTableMap::COL_JSON_DATA, 'json_data')
+            ->withColumn(SeoneI18nTableMap::COL_NOINDEX, 'noindex')
+            ->withColumn(SeoneI18nTableMap::COL_NOFOLLOW, 'nofollow')
+            ->withColumn(SeoneI18nTableMap::COL_H1, 'h1')
+            ->withColumn(SeoneI18nTableMap::COL_JSON_DATA, 'json_data')
             ->findOne();
 
         if (null !== $query) {
@@ -76,14 +86,15 @@ trait SEOneMicroDataTrait
             }
         }
 
-        $scriptsTag .= '<script type="application/ld+json">' . json_encode($storeMicroData, \JSON_UNESCAPED_UNICODE) . '</script>';
+        $scriptsTag .= '<script type="application/ld+json">'.json_encode($storeMicroData, \JSON_UNESCAPED_UNICODE).'</script>';
         if (null !== $microdata) {
-            $scriptsTag .= '<script type="application/ld+json">' . json_encode($microdata, \JSON_UNESCAPED_UNICODE) . '</script>';
+            $scriptsTag .= '<script type="application/ld+json">'.json_encode($microdata, \JSON_UNESCAPED_UNICODE).'</script>';
         }
 
         if (null !== $query && $query->getVirtualColumn('json_data')) {
-            $scriptsTag .= '<script type="application/ld+json">' . $query->getVirtualColumn('json_data') . '</script>';
+            $scriptsTag .= '<script type="application/ld+json">'.$query->getVirtualColumn('json_data').'</script>';
         }
+
         return $scriptsTag;
     }
 
@@ -94,11 +105,11 @@ trait SEOneMicroDataTrait
             '@context' => 'https://schema.org/',
             '@type' => 'Organization',
             'name' => ConfigQuery::read('store_name'),
-            'description' => ConfigQuery::read('store_description'),
+            'description' => SEOne::getConfigValue('description', ConfigQuery::read('store_description'), $this->langService->getLocale()),
             'url' => ConfigQuery::read('url_site'),
             'address' => [
                 '@type' => 'PostalAddress',
-                'streetAddress' => ConfigQuery::read('store_address1') . ' ' . ConfigQuery::read('store_address2') . ' ' . ConfigQuery::read('store_address3'),
+                'streetAddress' => ConfigQuery::read('store_address1').' '.ConfigQuery::read('store_address2').' '.ConfigQuery::read('store_address3'),
                 'addressLocality' => ConfigQuery::read('store_city'),
                 'addressCountry' => $country?->getIsoalpha2(),
                 'postalCode' => ConfigQuery::read('store_zipcode'),

@@ -1,9 +1,20 @@
 <?php
 
+/*
+ * This file is part of the Thelia package.
+ * http://www.thelia.net
+ *
+ * (c) OpenStudio <info@thelia.net>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace SEOne\Service\SeoDefaultModels;
 
 use SEOne\Model\Map\SeoneI18nTableMap;
 use SEOne\Model\SeoneQuery;
+use SEOne\SEOne;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Image\ImageEvent;
@@ -26,12 +37,11 @@ readonly class ProductSEO implements SeoElementInterface
     use SmartyCompatibilityTrait;
 
     public function __construct(
-        LangService              $langService,
+        LangService $langService,
         EventDispatcherInterface $eventDispatcher,
-        private RequestStack     $requestStack,
-        private TaxEngine        $taxEngine,
-    )
-    {
+        private RequestStack $requestStack,
+        private TaxEngine $taxEngine,
+    ) {
         $this->setDependencies(langService: $langService, dispatcher: $eventDispatcher);
     }
 
@@ -54,6 +64,7 @@ readonly class ProductSEO implements SeoElementInterface
     {
         return 0;
     }
+
     public function getSeoPageH1($id, string $type): string
     {
         $locale = $this->langService->getLocale();
@@ -63,20 +74,29 @@ readonly class ProductSEO implements SeoElementInterface
             ->useSEOneI18nQuery()
             ->filterByLocale($locale)
             ->endUse()
-            ->withColumn(SEOneI18nTableMap::COL_H1, 'h1')
+            ->withColumn(SeoneI18nTableMap::COL_H1, 'h1')
             ->findOne();
 
         if (null !== $query && $query->getVirtualColumn('h1')) {
             return $query->getVirtualColumn('h1');
         }
         $product = ProductQuery::create()->filterById($id)->useI18nQuery($locale)->endUse()->findOne();
+
         return $product?->getTitle() ?? ConfigQuery::read('store_name') ?? '';
     }
 
     public function getSeoPageTitle($id): string
     {
-        $product = ProductQuery::create()->filterById($id)->useI18nQuery($this->langService->getLocale())->endUse()->findOne();
-        return $product?->getTitle() ?? ConfigQuery::read('store_name') ?? '';
+        $product = ProductQuery::create()->filterById($id)->findOne()->setlocale($this->langService->getLocale());
+
+        return $product?->getMetaTitle() ?? $product?->getTitle() ?? SEOne::getConfigValue('title', ConfigQuery::read('store_name'), $this->langService->getLocale()) ?? '';
+    }
+
+    public function getSeoPageDesc($id): string
+    {
+        $product = ProductQuery::create()->filterById($id)->findOne()->setlocale($this->langService->getLocale());
+
+        return $product?->getMetaDescription() ?? SEOne::getConfigValue('description', ConfigQuery::read('store_description'), $this->langService->getLocale()) ?? '';
     }
 
     public function getSeoMicroData($id, string $type, array $params = []): string
@@ -93,6 +113,7 @@ readonly class ProductSEO implements SeoElementInterface
             lang: $this->langService->getLang(),
             relatedProducts: $relatedProducts
         );
+
         return $this->getScriptsTag(
             microdata: $microdata,
             defaultType: $type,
@@ -130,12 +151,12 @@ readonly class ProductSEO implements SeoElementInterface
         if ($image) {
             $baseSourceFilePath = ConfigQuery::read('images_library_path');
             if ($baseSourceFilePath === null) {
-                $baseSourceFilePath = THELIA_LOCAL_DIR . 'media' . DS . 'images';
+                $baseSourceFilePath = THELIA_LOCAL_DIR.'media'.DS.'images';
             } else {
-                $baseSourceFilePath = THELIA_ROOT . $baseSourceFilePath;
+                $baseSourceFilePath = THELIA_ROOT.$baseSourceFilePath;
             }
             $event = new ImageEvent();
-            $sourceFilePath = $baseSourceFilePath . '/product/' . $image->getFile();
+            $sourceFilePath = $baseSourceFilePath.'/product/'.$image->getFile();
 
             $event->setSourceFilepath($sourceFilePath);
             $event->setCacheSubdirectory('product');
@@ -183,7 +204,7 @@ readonly class ProductSEO implements SeoElementInterface
         }
 
         if ($weight = $pse->getWeight()) {
-            $microData['shipping_weight'] = $weight . ' kg';
+            $microData['shipping_weight'] = $weight.' kg';
         }
 
         if ($relatedProducts) {

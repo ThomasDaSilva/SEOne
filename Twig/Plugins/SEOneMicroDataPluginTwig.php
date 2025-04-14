@@ -28,31 +28,46 @@ class SEOneMicroDataPluginTwig extends AbstractExtension
         return [
             new TwigFunction('SEOneMicroData', [$this, 'getSeoMicroData']),
             new TwigFunction('SEOnePageTitle', [$this, 'getSeoPageTitle']),
+            new TwigFunction('SEOnePageDesc', [$this, 'getSeoPageDesc']),
             new TwigFunction('SEOnePageH1', [$this, 'getSeoPageH1']),
         ];
     }
 
-    public function getSeoPageTitle(string $view = null, string $id = null): string
+    public function getSeoPageTitle(?string $view = null, ?string $id = null): string
     {
         $defaultType = $view ?? $this->toolsService->getPageView() ?? '';
         $defaultId = $id ?? $this->toolsService->getPageId($defaultType);
-        return $this->toolsService->getSeoPageTitle(view: $defaultType,view_id: $defaultId);
+
+        return $this->toolsService->getSeoPageTitle(view: $defaultType, view_id: $defaultId);
     }
 
-    public function getSeoPageH1(string $view = null, string $id = null): string
+    public function getSeoPageH1(?string $view = null, ?string $id = null): string
     {
         $defaultType = $view ?? $this->toolsService->getPageView() ?? '';
         $defaultId = $id ?? $this->toolsService->getPageId($defaultType);
         if (null === $defaultId) {
             return '';
         }
-        return $this->toolsService->getSeoPageH1(view: $defaultType,view_id: $defaultId);
+
+        return $this->toolsService->getSeoPageH1(view: $defaultType, view_id: $defaultId);
     }
 
-    public function getSeoMicroData(string $view = null, array $params = []): string
+    public function getSeoPageDesc(?string $view = null, ?string $id = null): string
+    {
+        $defaultType = $view ?? $this->toolsService->getPageView() ?? '';
+        $defaultId = $id ?? $this->toolsService->getPageId($defaultType);
+        if (null === $defaultId) {
+            return '';
+        }
+
+        return $this->toolsService->getSeoPageDesc(view: $defaultType, view_id: $defaultId);
+    }
+
+    public function getSeoMicroData(?string $view = null, array $params = []): string
     {
         $defaultType = $view ?? $this->toolsService->getPageView() ?? '';
         $defaultId = $params['id'] ?? $this->toolsService->getPageId($defaultType);
+
         return $this->toolsService->getSeoMicroData(view: $defaultType, view_id: $defaultId, params: $params);
     }
 }
