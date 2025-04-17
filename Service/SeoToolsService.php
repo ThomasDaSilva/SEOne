@@ -101,4 +101,15 @@ readonly class SeoToolsService
     {
         return $this->requestStack->getCurrentRequest();
     }
+
+    public function getPageCanonical(): string
+    {
+        $canonicalUrlEvent = new SEOneUrlEvent();
+
+        $this->dispatcher->dispatch(
+            event: $canonicalUrlEvent,
+            eventName: SEOneUrlEvents::GENERATE_CANONICAL
+        );
+        return $canonicalUrlEvent->getUrl();
+    }
 }
