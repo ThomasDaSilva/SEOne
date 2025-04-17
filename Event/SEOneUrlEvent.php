@@ -6,7 +6,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class SEOneUrlEvent extends Event
 {
-    protected ?string $url;
+    protected ?string $url = null;
 
     public function getUrl(): ?string
     {
