@@ -30,6 +30,7 @@ class SEOneMicroDataPluginTwig extends AbstractExtension
             new TwigFunction('SEOnePageTitle', [$this, 'getSeoPageTitle']),
             new TwigFunction('SEOnePageDesc', [$this, 'getSeoPageDesc']),
             new TwigFunction('SEOnePageH1', [$this, 'getSeoPageH1']),
+            new TwigFunction('SEOnePageCanonical', [$this, 'getSeoCanonical'])
         ];
     }
 
@@ -68,5 +69,10 @@ class SEOneMicroDataPluginTwig extends AbstractExtension
         $defaultId = $params['id'] ?? $this->toolsService->getPageId($defaultType);
 
         return $this->toolsService->getSeoMicroData(view: $defaultType, view_id: $defaultId, params: $params);
+    }
+
+    public function getSeoCanonical(): string
+    {
+        return $this->toolsService->getPageCanonical();
     }
 }
