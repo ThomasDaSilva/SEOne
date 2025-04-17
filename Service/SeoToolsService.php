@@ -16,6 +16,8 @@ use SEOne\Event\SEOneSpecificEvents\SEOneMicroDataEvent;
 use SEOne\Event\SEOneSpecificEvents\SEOnePageDescEvent;
 use SEOne\Event\SEOneSpecificEvents\SEOnePageH1Event;
 use SEOne\Event\SEOneSpecificEvents\SEOnePageTitleEvent;
+use SEOne\Event\SEOneUrlEvent;
+use SEOne\Event\SEOneUrlEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
