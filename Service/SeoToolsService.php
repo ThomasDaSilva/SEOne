@@ -94,7 +94,7 @@ readonly class SeoToolsService
         return $this->getRequest()->get($seoService?->getIdentifier()) ?? null;
     }
 
-    public function getPageView(): string
+    public function getPageView(): ?string
     {
         return $this->getRequest()->get('_view');
     }
