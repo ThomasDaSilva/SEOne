@@ -83,7 +83,7 @@ class CanonicalUrlListener implements EventSubscriberInterface
                 $canonicalUrl .= '?page='.$page;
             }
         } elseif (isset($parseUrlByCurrentLocale['query'])) {
-            $canonicalUrl .= '/?'.(\array_key_exists('query', $parseUrlByCurrentLocale)) ? $parseUrlByCurrentLocale['query'] : '';
+            $canonicalUrl .= '/?'.((\array_key_exists('query', $parseUrlByCurrentLocale)) ? $parseUrlByCurrentLocale['query'] : '');
         }
 
         try {
