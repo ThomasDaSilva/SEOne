@@ -15,8 +15,6 @@ namespace SEOne\Service\SeoDefaultModels;
 use SEOne\SEOne;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\Folder;
-use Thelia\Model\Lang;
 use Thelia\Service\Model\LangService;
 
 readonly class DefaultSEO implements SeoElementInterface
@@ -70,7 +68,12 @@ readonly class DefaultSEO implements SeoElementInterface
         return '';
     }
 
-    private function getDefaultMicroData(Folder $folder, Lang $lang): array
+    private function getDefaultMicroData(): array
+    {
+        return [];
+    }
+
+    public function getSeoBreadcrumb($id): array
     {
         return [];
     }

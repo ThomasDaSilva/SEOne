@@ -111,4 +111,31 @@ readonly class FolderSEO implements SeoElementInterface
 
         return $microData;
     }
+
+    public function getSeoBreadcrumb($id): array
+    {
+        $breadcrumb = [];
+
+        if ($id) {
+            $breadcrumb = array_reverse($this->getFolderPath($id));
+        }
+
+        return $breadcrumb;
+    }
+
+    public function getFolderPath(int $fodlerId, ?array $path = []): array
+    {
+        $folder = FolderQuery::create()->filterById($fodlerId)->findOne()->setlocale($this->langService->getLocale());
+
+        $path[] = [
+            'url' => $folder->getUrl(),
+            'title' => $folder->getTitle(),
+        ];
+
+        if ($folder->getParent() !== 0) {
+            $path = $this->getFolderPath($folder->getParent(), $path);
+        }
+
+        return $path;
+    }
 }

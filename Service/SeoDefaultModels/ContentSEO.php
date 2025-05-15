@@ -17,6 +17,7 @@ use SEOne\Model\SeoneQuery;
 use SEOne\SEOne;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Lang;
@@ -29,6 +30,7 @@ readonly class ContentSEO implements SeoElementInterface
     public function __construct(
         LangService $langService,
         EventDispatcherInterface $eventDispatcher,
+        private FolderSEO $folderSeo,
     ) {
         $this->setDependencies(langService: $langService, dispatcher: $eventDispatcher);
     }
@@ -129,5 +131,26 @@ readonly class ContentSEO implements SeoElementInterface
         }
 
         return $microData;
+    }
+
+    public function getSeoBreadcrumb($id): array
+    {
+        $breadcrumb = [];
+
+        if ($id) {
+            $contentFolder = ContentFolderQuery::create()
+                ->filterByContentId($id)
+                ->findOne();
+
+            $content = $contentFolder->getContent()->setlocale($this->langService->getLocale());
+
+            $breadcrumb[] = [
+                'url' => $content->getUrl(),
+                'title' => $content->getTitle(),
+            ];
+            $breadcrumb = array_reverse($this->folderSeo->getFolderPath($contentFolder->getFolderId(), $breadcrumb));
+        }
+
+        return $breadcrumb;
     }
 }
