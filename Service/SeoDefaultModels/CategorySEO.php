@@ -28,7 +28,7 @@ use Thelia\Service\Model\LangService;
 
 readonly class CategorySEO implements SeoElementInterface
 {
-    use SEOneMicroDataTrait;
+    use SeoneBreadcrumbTrait;
 
     public function __construct(
         LangService $langService,
@@ -71,6 +71,17 @@ readonly class CategorySEO implements SeoElementInterface
         }
 
         return $this->getScriptsTag($microdata, $type, $id);
+    }
+
+    public function getSeoBreadcrumb($id): array
+    {
+        $breadcrumb = [];
+
+        if ($id) {
+            $breadcrumb = array_reverse($this->getCategoryPath($id));
+        }
+
+        return $breadcrumb;
     }
 
     public function getSeoPageTitle($id): string
@@ -142,5 +153,21 @@ readonly class CategorySEO implements SeoElementInterface
         }
 
         return $category->getProducts();
+    }
+
+    public function getCategoryPath(int $categoryId, ?array $path = []): array
+    {
+        $category = CategoryQuery::create()->filterById($categoryId)->findOne()->setlocale($this->langService->getLocale());
+
+        $path[] = [
+            'url' => $category->getUrl(),
+            'title' => $category->getTitle(),
+        ];
+
+        if ($category->getParent() !== 0) {
+            $path = $this->getCategoryPath($category->getParent(), $path);
+        }
+
+        return $path;
     }
 }

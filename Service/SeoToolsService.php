@@ -12,6 +12,7 @@
 
 namespace SEOne\Service;
 
+use SEOne\Event\SEOneBreadcrumbEvent;
 use SEOne\Event\SEOneSpecificEvents\SEOneMicroDataEvent;
 use SEOne\Event\SEOneSpecificEvents\SEOnePageDescEvent;
 use SEOne\Event\SEOneSpecificEvents\SEOnePageH1Event;
@@ -78,6 +79,18 @@ readonly class SeoToolsService
         return $microDataEvent->getTitle() ?? '';
     }
 
+    public function getSeoBreadcrumb(string $view, ?int $view_id, array $params = []): array
+    {
+        $breadcrumbEvent = new SEOneBreadcrumbEvent(view: $view, view_id: $view_id, parameters: $params);
+
+        $this->dispatcher->dispatch(
+            event: $breadcrumbEvent,
+            eventName: SEOneBreadcrumbEvent::BETTER_SEO_BREADCRUMB
+        );
+
+        return $breadcrumbEvent->getBreadcrumb();
+    }
+
     public function getPageId(string $view): ?string
     {
         $key = $view.'_id';
@@ -112,6 +125,7 @@ readonly class SeoToolsService
             event: $canonicalUrlEvent,
             eventName: SEOneUrlEvents::GENERATE_CANONICAL
         );
+
         return $canonicalUrlEvent->getUrl();
     }
 }

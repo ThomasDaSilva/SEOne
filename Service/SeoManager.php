@@ -57,6 +57,14 @@ class SeoManager
         return $seoService->getSeoMicroData(id: $id, type: $view, params: $params);
     }
 
+    public function getSeoBreadCrumb($id = null, ?string $view = null, array $params = []): array
+    {
+        /** @var SeoElementInterface $seoService */
+        $seoService = $this->getSeoServiceByView(view: $view);
+
+        return $seoService->getSeoBreadcrumb(id: $id);
+    }
+
     public function getSeoServiceByView(string $view): ?SeoElementInterface
     {
         $seoServicesArray = iterator_to_array($this->seoServices);

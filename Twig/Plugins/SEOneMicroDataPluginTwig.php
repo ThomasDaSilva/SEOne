@@ -13,6 +13,7 @@
 namespace SEOne\Twig\Plugins;
 
 use SEOne\Service\SeoToolsService;
+use Thelia\Model\ConfigQuery;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -30,7 +31,9 @@ class SEOneMicroDataPluginTwig extends AbstractExtension
             new TwigFunction('SEOnePageTitle', [$this, 'getSeoPageTitle']),
             new TwigFunction('SEOnePageDesc', [$this, 'getSeoPageDesc']),
             new TwigFunction('SEOnePageH1', [$this, 'getSeoPageH1']),
-            new TwigFunction('SEOnePageCanonical', [$this, 'getSeoCanonical'])
+            new TwigFunction('SEOnePageCanonical', [$this, 'getSeoCanonical']),
+            new TwigFunction('SEOneBreadcrumb', [$this, 'getSeoBreadcrumb']),
+            new TwigFunction('SEOneBreadcrumbJsonLd', [$this, 'getSeoBreadcrumbJsonLd']),
         ];
     }
 
@@ -74,5 +77,47 @@ class SEOneMicroDataPluginTwig extends AbstractExtension
     public function getSeoCanonical(): string
     {
         return $this->toolsService->getPageCanonical();
+    }
+
+    public function getSeoBreadcrumb(?string $view = null, array $params = []): array
+    {
+        $defaultType = $view ?? $this->toolsService->getPageView() ?? '';
+        $defaultId = $params['id'] ?? $this->toolsService->getPageId($defaultType);
+
+        return $this->toolsService->getSeoBreadcrumb(view: $defaultType, view_id: $defaultId, params: $params);
+    }
+
+    public function getSeoBreadcrumbJsonLd(?array $breadcrumb): string
+    {
+        if (!$breadcrumb || empty($breadcrumb)) {
+            return '';
+        }
+
+        $itemListElement = [];
+        $homeItem = [
+            '@type' => 'ListItem',
+            'position' => 1,
+            'item' => [
+                '@id' => ConfigQuery::read('url_site'),
+                'name' => ConfigQuery::read('store_name'),
+            ],
+        ];
+
+        foreach ($breadcrumb as $key => $item) {
+            $itemListElement[] = [
+                '@type' => 'ListItem',
+                'position' => $key + 1,
+                'item' => [
+                    '@id' => $item['url'],
+                    'name' => $item['title'],
+                ],
+            ];
+        }
+
+        return '<script type="application/ld+json">'.json_encode([
+            '@context' => 'https://schema.org/',
+            '@type' => 'BreadcrumbList',
+            'itemListElement' => array_merge($homeItem, $itemListElement),
+        ]).'</script>';
     }
 }

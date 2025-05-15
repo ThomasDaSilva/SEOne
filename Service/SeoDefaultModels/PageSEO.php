@@ -111,4 +111,20 @@ readonly class PageSEO implements SeoElementInterface
 
         return $microData;
     }
+
+    public function getSeoBreadcrumb($id): array
+    {
+        $breadcrumb = [];
+
+        if ($id) {
+            $page = PageQuery::create()->filterById($id)->findOne()->setlocale($this->langService->getLocale());
+
+            $breadcrumb[] = [
+                'url' => $page->getUrl(),
+                'title' => $page->getTitle(),
+            ];
+        }
+
+        return $breadcrumb;
+    }
 }

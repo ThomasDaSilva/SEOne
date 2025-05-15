@@ -27,6 +27,8 @@ interface SeoElementInterface
 
     public function getSeoMicroData($id, string $type, array $params = []): string;
 
+    public function getSeoBreadcrumb($id): array;
+
     public function getSeoPageTitle($id): string;
 
     public function getSeoPageH1($id, string $type): string;

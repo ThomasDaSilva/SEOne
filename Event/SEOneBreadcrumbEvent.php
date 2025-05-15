@@ -10,19 +10,18 @@
  * file that was distributed with this source code.
  */
 
-namespace SEOne\Event\SEOneSpecificEvents;
+namespace SEOne\Event;
 
 use Thelia\Core\Event\ActionEvent;
 
-class SEOneMicroDataEvent extends ActionEvent
+class SEOneBreadcrumbEvent extends ActionEvent
 {
-    protected string $title = '';
     protected string $view;
     protected ?int $view_id;
     protected $parameters = [];
-    public const BETTER_SEO_MICRO_DATA = 'better.seo.page.micro.data';
+    public const BETTER_SEO_BREADCRUMB = 'seone.page.breadcrumb';
 
-    public function __construct(string $view, ?int $view_id, array $parameters)
+    public function __construct(string $view, ?int $view_id, ?array $parameters)
     {
         $this->view = $view;
         $this->view_id = $view_id;
@@ -41,16 +40,14 @@ class SEOneMicroDataEvent extends ActionEvent
         return $this;
     }
 
-    public function getTitle(): string
+    public function getBreadcrumb(): array
     {
-        return $this->title;
+        return $this->breadcrumb;
     }
 
-    public function setTitle(string $title): self
+    public function setBreadcrumb(array $breadcrumb): void
     {
-        $this->title = $title;
-
-        return $this;
+        $this->breadcrumb = $breadcrumb;
     }
 
     public function getView(): string
@@ -58,11 +55,9 @@ class SEOneMicroDataEvent extends ActionEvent
         return $this->view;
     }
 
-    public function setView(string $view): self
+    public function setView($view): void
     {
         $this->view = $view;
-
-        return $this;
     }
 
     public function getViewId(): ?int
@@ -70,10 +65,8 @@ class SEOneMicroDataEvent extends ActionEvent
         return $this->view_id;
     }
 
-    public function setViewId(?int $view_id): self
+    public function setViewId($view_id): void
     {
         $this->view_id = $view_id;
-
-        return $this;
     }
 }

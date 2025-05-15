@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Exception\TaxEngineException;
+use Thelia\Model\Base\ProductCategoryQuery;
 use Thelia\Model\BrandI18nQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
@@ -41,6 +42,7 @@ readonly class ProductSEO implements SeoElementInterface
         EventDispatcherInterface $eventDispatcher,
         private RequestStack $requestStack,
         private TaxEngine $taxEngine,
+        private CategorySEO $categorySEO,
     ) {
         $this->setDependencies(langService: $langService, dispatcher: $eventDispatcher);
     }
@@ -215,5 +217,26 @@ readonly class ProductSEO implements SeoElementInterface
         }
 
         return $microData;
+    }
+
+    public function getSeoBreadcrumb($id): array
+    {
+        $breadcrumb = [];
+
+        if ($id) {
+            $productCategory = ProductCategoryQuery::create()
+                ->filterByProductId($id)
+                ->findOne();
+
+            $product = $productCategory->getProduct()->setlocale($this->langService->getLocale());
+
+            $breadcrumb[] = [
+                'url' => $product->getUrl(),
+                'title' => $product->getTitle(),
+            ];
+            $breadcrumb = array_reverse($this->categorySEO->getCategoryPath($productCategory->getCategoryId(), $breadcrumb));
+        }
+
+        return $breadcrumb;
     }
 }
