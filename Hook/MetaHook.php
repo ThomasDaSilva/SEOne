@@ -12,8 +12,6 @@ use Thelia\Core\Template\Parser\ParserResolver;
 
 class MetaHook extends BaseHook
 {
-    protected $request;
-
     public function __construct(
         protected RequestStack $requestStack,
         public ?EventDispatcherInterface $dispatcher = null,
