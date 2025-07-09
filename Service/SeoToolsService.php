@@ -12,6 +12,7 @@
 
 namespace SEOne\Service;
 
+use SEOne\Event\AlternateHreflangEvent;
 use SEOne\Event\SEOneBreadcrumbEvent;
 use SEOne\Event\SEOneSpecificEvents\SEOneMicroDataEvent;
 use SEOne\Event\SEOneSpecificEvents\SEOnePageDescEvent;
@@ -22,14 +23,21 @@ use SEOne\Event\SEOneUrlEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Thelia\Model\Base\LangQuery;
 
 readonly class SeoToolsService
 {
     public function __construct(
-        private RequestStack $requestStack,
+        private RequestStack             $requestStack,
         private EventDispatcherInterface $dispatcher,
-        private SeoManager $seoDefaultManager,
-    ) {
+        private SeoManager               $seoDefaultManager,
+    )
+    {
+    }
+
+    private function getRequest(): Request
+    {
+        return $this->requestStack->getCurrentRequest();
     }
 
     public function getSeoPageTitle(string $view, ?int $view_id): string
@@ -93,7 +101,7 @@ readonly class SeoToolsService
 
     public function getPageId(string $view): ?string
     {
-        $key = $view.'_id';
+        $key = $view . '_id';
         $type = $this->getRequest()->get($key);
         if ($type) {
             return $type;
@@ -112,11 +120,6 @@ readonly class SeoToolsService
         return $this->getRequest()->get('_view');
     }
 
-    private function getRequest(): Request
-    {
-        return $this->requestStack->getCurrentRequest();
-    }
-
     public function getPageCanonical(): string
     {
         $canonicalUrlEvent = new SEOneUrlEvent();
@@ -127,5 +130,46 @@ readonly class SeoToolsService
         );
 
         return $canonicalUrlEvent->getUrl();
+    }
+
+    public function getHreflang(): string
+    {
+        $request = $this->getRequest();
+
+        $currentLocale = $request->getSession()->getLang()->getLocale();
+
+        $langs = LangQuery::create()
+            ->filterByVisible(true)
+            ->find();
+
+        $metas = [];
+
+        $defaultHrefLang = null;
+        $currentHrefLang = null;
+
+        foreach ($langs as $lang) {
+            $event = new AlternateHreflangEvent($lang, $request);
+
+            $this->dispatcher->dispatch($event, AlternateHreflangEvent::BASE_EVENT_NAME);
+
+            $hreflang = strtolower(str_replace('_', '-', $lang->getLocale()));
+
+            if (0 === (int) AlternateHreflangEvent::CONFIG_KEY_HREFLANG_FORMAT) {
+                $hreflang = strtolower(explode('_', $lang->getLocale())[0]);
+            }
+
+            if (!empty($event->getUrl())) {
+                if ($lang->getByDefault()) {
+                    $defaultHrefLang = '<link rel="alternate" hreflang="x-default" href="' . $event->getUrl() . '">';
+                }
+
+                if ($lang->getLocale() === $currentLocale) {
+                    $currentHrefLang = '<link rel="alternate" hreflang="' . $hreflang . '" href="' . $event->getUrl() . '">';
+                } else {
+                    $metas[] = '<link rel="alternate" hreflang="' . $hreflang . '" href="' . $event->getUrl() . '">';
+                }
+            }
+        }
+        return implode('', array_merge($metas, [$currentHrefLang ?? '',$defaultHrefLang ?? '' ] ));
     }
 }

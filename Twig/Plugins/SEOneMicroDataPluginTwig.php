@@ -34,6 +34,7 @@ class SEOneMicroDataPluginTwig extends AbstractExtension
             new TwigFunction('SEOnePageCanonical', [$this, 'getSeoCanonical']),
             new TwigFunction('SEOneBreadcrumb', [$this, 'getSeoBreadcrumb']),
             new TwigFunction('SEOneBreadcrumbJsonLd', [$this, 'getSeoBreadcrumbJsonLd']),
+            new TwigFunction('SEOneHreflang', [$this, 'getHreflang'])
         ];
     }
 
@@ -77,6 +78,11 @@ class SEOneMicroDataPluginTwig extends AbstractExtension
     public function getSeoCanonical(): string
     {
         return $this->toolsService->getPageCanonical();
+    }
+
+    public function getHreflang(): string
+    {
+        return $this->toolsService->getHreflang();
     }
 
     public function getSeoBreadcrumb(?string $view = null, array $params = []): array
