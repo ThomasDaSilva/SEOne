@@ -62,6 +62,11 @@ class SEOneLoop extends BaseI18nLoop implements PropelSearchLoopInterface
             ->withColumn(SEOneI18nTableMap::COL_JSON_DATA, 'json_data');
 
         for ($i = 1; $i <= 5; ++$i) {
+            if(!defined(SEOneI18nTableMap::class.'::MESH_TEXT_'.$i) ||
+                !defined(SEOneI18nTableMap::class.'::MESH_URL_'.$i) ||
+                !defined(SEOneI18nTableMap::class.'::MESH_'.$i)) {
+                continue;
+            }
             $query->withColumn(\constant(SEOneI18nTableMap::class.'::MESH_TEXT_'.$i), 'mesh_text_'.$i);
             $query->withColumn(\constant(SEOneI18nTableMap::class.'::MESH_URL_'.$i), 'mesh_url_'.$i);
             $query->withColumn(\constant(SEOneI18nTableMap::class.'::MESH_'.$i), 'mesh_'.$i);
