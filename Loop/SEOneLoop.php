@@ -12,6 +12,7 @@
 
 namespace SEOne\Loop;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use SEOne\Model\Map\SEOneI18nTableMap;
 use SEOne\Model\Seone;
 use SEOne\Model\SeoneQuery;
@@ -30,7 +31,7 @@ use Thelia\Model\LangQuery;
  */
 class SEOneLoop extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createAlphaNumStringTypeArgument('object_id'),
@@ -39,7 +40,7 @@ class SEOneLoop extends BaseI18nLoop implements PropelSearchLoopInterface
         );
     }
 
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $objectId = $this->getObjectId();
         $objectType = $this->getObjectType();
