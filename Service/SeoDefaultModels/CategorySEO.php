@@ -19,7 +19,7 @@ use SEOne\Model\SeoneQuery;
 use SEOne\SEOne;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Thelia\Domain\Localization\LangService;
+use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Model\Category;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ConfigQuery;
