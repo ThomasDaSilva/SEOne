@@ -18,9 +18,9 @@ use SEOne\Model\Map\SeoneI18nTableMap;
 use SEOne\Model\SeoneQuery;
 use SEOne\SEOne;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
-use Thelia\Domain\Localization\LangService;
 
 readonly class PageSEO implements SeoElementInterface
 {
