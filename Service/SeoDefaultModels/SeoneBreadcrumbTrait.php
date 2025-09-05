@@ -19,8 +19,8 @@ use SEOne\Event\SEOneStoreMicroDataEvents;
 use SEOne\Model\Map\SeoneI18nTableMap;
 use SEOne\Model\SeoneQuery;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Domain\Localization\Service\LangService;
 use Thelia\Model\LangQuery;
-use Thelia\Domain\Localization\LangService;
 
 trait SeoneBreadcrumbTrait
 {
