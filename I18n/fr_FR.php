@@ -1,6 +1,21 @@
 <?php
 
-return array(
+return [
+    'robot.button' => 'Modifier',
+    'robot.help' => 'N\'oubliez pas de supprimer le fichier "robots.txt" après avoir initialiser la table "robots".',
+    'robot.title' => 'Modifier le fichier robots.txt',
+    'Better Seo configuration' => 'Better Seo configuration	',
+    'Link' => 'Lien',
+    'Link URL' => 'URL du lien',
+    'Link text' => 'Texte du lien',
+    'Mesh' => 'Texte de maillage',
+    'Mesh links' => 'Liens maillés',
+    'Save' => 'Enregistrer',
+    'Text' => 'Texte',
+    'label.noindex' => 'Gestion de la meta robots noindex, nofollow, balise H1 et liens maillés :',
+    'noindex_nofollow.help' => 'Gestion de la meta robots noindex, nofollow. Permet de ne pas indexer cette page pour les moteurs de recherche. Attention avant de cocher cela, bien vérifier que votre page ne génère pas de trafic sur Google Analytics. Vous risquez de perdre du référencement.',
+    'Configuration correctly saved' => 'Configuration sauvée avec succès',
+    'Configure Store' => 'Configuration boutique',
     'category limit' => 'nombre de produits par catégorie',
     'limit products load with better seo in your category page, use it for better performance' => 'limite le nombre de produits chargés par Seone dans la page catégorie. A utiliser pour de meilleurs performance',
-);
+];

@@ -52,5 +52,12 @@
         />
       </behavior>
     </table>
+
+    <table name="robots" namespace="SEOne\Model">
+      <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+      <column name="domain_name"  required="true" type="VARCHAR" />
+      <column name="robots_content"  required="true" type="LONGVARCHAR" />
+    </table>
+
   <external-schema filename="local/config/schema.xml" referenceOnly="true" />
 </database>

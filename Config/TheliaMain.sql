@@ -18,6 +18,20 @@ CREATE TABLE `seone`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- robots
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `robots`;
+
+CREATE TABLE `robots`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `domain_name` VARCHAR(255) NOT NULL,
+    `robots_content` TEXT NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- seone_i18n
 -- ---------------------------------------------------------------------
 

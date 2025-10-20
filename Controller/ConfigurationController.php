@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Thelia package.
  * http://www.thelia.net
@@ -12,9 +14,12 @@
 
 namespace SEOne\Controller;
 
-use SEOne\SEOne;
 use SEOne\Form\CategoryLimitForm;
+use SEOne\Form\EditRobotTxtForm;
 use SEOne\Form\StoreSeoForm;
+use SEOne\Model\RobotsQuery;
+use SEOne\SEOne;
+use SEOne\Service\RobotTxtService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -89,14 +94,38 @@ class ConfigurationController extends AdminController
             // Send the form and the error to the parser
             $this->getParserContext()
                 ->addForm($baseForm)
-                ->setGeneralError($errorMessage)
-            ;
+                ->setGeneralError($errorMessage);
         } else {
             $this->getParserContext()
-                ->set('success', true)
-            ;
+                ->set('success', true);
         }
 
         return $this->generateErrorRedirect($baseForm);
+    }
+
+    #[Route('/edit-robottxt', name: 'edit_robottxt', methods: 'POST')]
+    public function editRobotTxt(ParserContext $parserContext, RobotTxtService $robotTxtService): RedirectResponse
+    {
+        $form = $this->createForm(EditRobotTxtForm::getName());
+
+        try {
+            $editRobotTxtForm = $this->validateForm($form);
+
+            $robotTxtService->saveRobotTxtByDomain($editRobotTxtForm->get('domainName')->getData(), $editRobotTxtForm->get('robotContent')->getData());
+
+            return $this->generateSuccessRedirect($form);
+        } catch (FormValidationException $e) {
+            $error_message = $this->createStandardFormValidationErrorMessage($e);
+        } catch (\Exception $e) {
+            $error_message = $e->getMessage();
+        }
+
+        $form->setErrorMessage($error_message);
+
+        $parserContext
+            ->addForm($form)
+            ->setGeneralError($error_message);
+
+        return $this->generateErrorRedirect($form);
     }
 }
