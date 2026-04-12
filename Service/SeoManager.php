@@ -14,12 +14,12 @@ namespace SEOne\Service;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use SEOne\Service\SeoDefaultModels\SeoElementInterface;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 class SeoManager
 {
     public function __construct(
-        #[TaggedIterator('seone.type')]
+        #[AutowireIterator('seone.type')]
         private readonly iterable $seoServices,
         protected EventDispatcherInterface $dispatcher,
     ) {
