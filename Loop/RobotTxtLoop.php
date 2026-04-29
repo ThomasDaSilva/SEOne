@@ -38,7 +38,7 @@ class RobotTxtLoop extends BaseLoop implements ArraySearchLoopInterface
         foreach ($domains as $domain) {
             $robot = $this->robotTxtService->getCurrentRobotTxt($domain);
             if (!$robot) {
-                $robots = [
+                $robots[] = [
                     'id' => null,
                     'domain_name' => $domain,
                     'robots_content' => null
