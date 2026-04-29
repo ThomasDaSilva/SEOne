@@ -41,18 +41,20 @@ class ConfigurationHook extends BaseHook
 
         if (0 >= $robots->count()) {
             if (!ConfigQuery::read('one_domain_foreach_lang')) {
-                $robots[] = (new Robots())
+                $robot = (new Robots())
                     ->setDomainName(URL::getInstance()->getBaseUrl())
-                    ->setRobotsContent('')
-                    ->save();
+                    ->setRobotsContent('');
+                $robot->save();
+                $robots[] = $robot;
             } else {
                 $langs = LangQuery::create()->filterByActive(true)->find();
                 foreach ($langs as $lang) {
                     if ($url = $lang->getUrl()) {
-                        $robots[] = (new Robots())
+                        $robot = (new Robots())
                             ->setDomainName($url)
-                            ->setRobotsContent('')
-                            ->save();
+                            ->setRobotsContent('');
+                        $robot->save();
+                        $robots[] = $robot;
                     }
                 }
             }
