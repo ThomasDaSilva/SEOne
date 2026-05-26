@@ -81,7 +81,7 @@ readonly class ProductSEO implements SeoElementInterface
         if (null !== $query && $query->getVirtualColumn('h1')) {
             return $query->getVirtualColumn('h1');
         }
-        $product = ProductQuery::create()->filterById($id)->useI18nQuery($locale)->endUse()->findOne();
+        $product = ProductQuery::create()->filterById($id)->findOne()->setlocale($locale);
 
         return $product?->getTitle() ?? ConfigQuery::read('store_name') ?? '';
     }

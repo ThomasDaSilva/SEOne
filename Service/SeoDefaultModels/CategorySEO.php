@@ -113,8 +113,7 @@ readonly class CategorySEO implements SeoElementInterface
         if (null !== $query && $query->getVirtualColumn('h1')) {
             return $query->getVirtualColumn('h1');
         }
-        $category = CategoryQuery::create()->filterById($id)->useI18nQuery($locale)->endUse()->findOne();
-
+        $category = CategoryQuery::create()->filterById($id)->findOne()->setLocale($locale);
         return $category?->getTitle() ?? ConfigQuery::read('store_name') ?? '';
     }
 
