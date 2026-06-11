@@ -59,7 +59,7 @@ class SeoFormListener extends BaseAction implements EventSubscriberInterface
 
     protected function saveSeoFields(UpdateSeoEvent $event, $eventName, EventDispatcherInterface $dispatcher, $elementKey): void
     {
-        $form = $this->requestStack->getCurrentRequest()->get('thelia_seo');
+        $form = $this->submittedSeoForm($elementKey);
 
         if (null === $form || !\array_key_exists('id', $form) || !\array_key_exists('canonical', $form)) {
             return;
@@ -93,5 +93,27 @@ class SeoFormListener extends BaseAction implements EventSubscriberInterface
                 'canonical',
                 TextType::class
             );
+    }
+
+    private function submittedSeoForm(string $elementKey): ?array
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (null === $request) {
+            return null;
+        }
+
+        // Smarty BO posts everything under the shared BaseForm name `thelia_seo`; the Twig BO
+        // posts its native fields under per-entity mirror names while the canonical input
+        // rendered by SeoUpdateFormHook keeps the legacy name. Merge them, first name wins per key.
+        $merged = [];
+
+        foreach (['thelia_seo', \sprintf('thelia_%s_seo', $elementKey), 'thelia_brand_seo_modification'] as $name) {
+            if ($request->request->has($name)) {
+                $merged += (array) $request->request->all($name);
+            }
+        }
+
+        return [] === $merged ? null : $merged;
     }
 }
