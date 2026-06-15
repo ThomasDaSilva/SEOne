@@ -2,22 +2,57 @@
 
 namespace SEOne\Hook;
 
+use SEOne\Form\CategoryLimitForm;
+use SEOne\Form\EditRobotTxtForm;
+use SEOne\Form\StoreSeoForm;
 use SEOne\Model\Robots;
 use SEOne\Model\RobotsQuery;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Hook\HookRenderEvent;
+use Thelia\Core\Form\TheliaFormFactory;
 use Thelia\Core\Hook\BaseHook;
+use Thelia\Core\Template\Parser\ParserResolver;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
 use Thelia\Tools\URL;
 
 class ConfigurationHook extends BaseHook
 {
+    public function __construct(
+        private readonly TheliaFormFactory $formFactory,
+        ?EventDispatcherInterface $dispatcher = null,
+        ?ParserResolver $parserResolver = null,
+    ) {
+        parent::__construct($dispatcher, $parserResolver);
+    }
+
     public function onModuleConfiguration(HookRenderEvent $event): void
     {
         $configRobotTxt = $this->getRobotTxtConfiguration();
 
+        $storeForm = $this->formFactory->createForm(StoreSeoForm::getName());
+        $storeForm->createView();
+
+        $categoryForm = $this->formFactory->createForm(CategoryLimitForm::getName());
+        $categoryForm->createView();
+
+        $robotForms = [];
+        foreach ($configRobotTxt as $robotId => $robot) {
+            $robotForm = $this->formFactory->createForm(EditRobotTxtForm::getName(), data: [
+                'id' => $robotId,
+                'domainName' => $robot[0],
+                'robotContent' => $robot[1],
+            ]);
+            $robotForm->createView();
+            $robotForms[] = $robotForm->getView();
+        }
+
         $event->add(
-            $this->render('module_configuration.html', ['configRobotTxt' => $configRobotTxt])
+            $this->render('SEOne/module_configuration.html.twig', [
+                'store_form' => $storeForm->getView(),
+                'category_form' => $categoryForm->getView(),
+                'robot_forms' => $robotForms,
+            ])
         );
     }
 

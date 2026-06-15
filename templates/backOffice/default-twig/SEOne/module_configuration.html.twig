@@ -1,0 +1,102 @@
+{# ============ Store SEO configuration ============ #}
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">{{ 'Configure Store'|trans({}, 'seone') }}</h5>
+    </div>
+    <div class="card-body">
+        {{ form_start(store_form, {action: path('seone_config_store_configuration'), method: 'POST'}) }}
+            <input type="hidden" name="{{ store_form.vars.full_name }}[success_url]" value="{{ path('admin.module.configure', {module_code: 'SEOne'}) }}">
+            <input type="hidden" name="{{ store_form.vars.full_name }}[error_url]" value="{{ path('admin.module.configure', {module_code: 'SEOne'}) }}">
+            {% do store_form.success_url.setRendered %}
+            {% do store_form.error_url.setRendered %}
+
+            {{ form_errors(store_form) }}
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    {{ form_label(store_form.title) }}
+                    {{ form_widget(store_form.title, {attr: {class: 'form-control'}}) }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    {{ form_label(store_form.description) }}
+                    {{ form_widget(store_form.description, {attr: {class: 'form-control'}}) }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    {{ form_label(store_form.keywords) }}
+                    {{ form_widget(store_form.keywords, {attr: {class: 'form-control'}}) }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save"></i> {{ 'Save'|trans({}, 'seone.bo.default') }}
+            </button>
+        {{ form_end(store_form) }}
+    </div>
+</div>
+
+{# ============ Category configuration ============ #}
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">{{ 'Seo configuration'|trans({}, 'seone') }}</h5>
+    </div>
+    <div class="card-body">
+        {{ form_start(category_form, {action: path('seone_config_category_configuration'), method: 'POST'}) }}
+            <input type="hidden" name="{{ category_form.vars.full_name }}[success_url]" value="{{ path('admin.module.configure', {module_code: 'SEOne'}) }}">
+            <input type="hidden" name="{{ category_form.vars.full_name }}[error_url]" value="{{ path('admin.module.configure', {module_code: 'SEOne'}) }}">
+            {% do category_form.success_url.setRendered %}
+            {% do category_form.error_url.setRendered %}
+
+            {{ form_errors(category_form) }}
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form_label(category_form.category_limit) }}
+                    {{ form_widget(category_form.category_limit, {attr: {class: 'form-control'}}) }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save"></i> {{ 'Save'|trans({}, 'seone.bo.default') }}
+            </button>
+        {{ form_end(category_form) }}
+    </div>
+</div>
+
+{# ============ robots.txt configuration ============ #}
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">{{ 'Robots.txt'|trans({}, 'seone') }}</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            {% for robot_form in robot_forms %}
+                <div class="col-md-6 mb-4">
+                    {{ form_start(robot_form, {action: path('seone_config_edit_robottxt'), method: 'POST'}) }}
+                        <input type="hidden" name="{{ robot_form.vars.full_name }}[success_url]" value="{{ path('admin.module.configure', {module_code: 'SEOne'}) }}">
+                        <input type="hidden" name="{{ robot_form.vars.full_name }}[error_url]" value="{{ path('admin.module.configure', {module_code: 'SEOne'}) }}">
+                        {% do robot_form.success_url.setRendered %}
+                        {% do robot_form.error_url.setRendered %}
+
+                        <input type="hidden" name="{{ robot_form.id.vars.full_name }}" value="{{ robot_form.id.vars.value }}">
+                        {% do robot_form.id.setRendered %}
+
+                        {{ form_errors(robot_form) }}
+
+                        <div class="mb-3">
+                            {{ form_label(robot_form.domainName) }}
+                            {{ form_widget(robot_form.domainName, {attr: {class: 'form-control'}}) }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form_label(robot_form.robotContent) }}
+                            {{ form_widget(robot_form.robotContent, {attr: {class: 'form-control font-monospace', rows: 12}}) }}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> {{ 'Save'|trans({}, 'seone') }}
+                        </button>
+                    {{ form_end(robot_form) }}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>

@@ -16,6 +16,7 @@ namespace SEOne\Form;
 
 use SEOne\SEOne;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
@@ -39,8 +40,9 @@ class EditRobotTxtForm extends BaseForm
 
         $this->formBuilder->add(
             'robotContent',
-            TextType::class,
+            TextareaType::class,
             [
+                'required' => false,
                 'label' => Translator::getInstance()->trans(
                     'Robot Content',
                     [],
