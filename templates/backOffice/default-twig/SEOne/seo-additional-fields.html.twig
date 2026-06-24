@@ -1,0 +1,88 @@
+{# SEOne advanced SEO fields, rendered inside the SEO tab (default-twig back office).
+   Wrapped in the "SEOne" card by the theme hook_cards() helper, so this template only
+   carries the form. One form, one save: canonical override + robots + H1 + JSON-LD + mesh. #}
+{% set d = 'seone' %}
+{% set values = values|default({}) %}
+
+<form method="post" action="{{ path('seone_seo_save', { object_id: object_id, object_type: object_type, lang_id: edit_language_id }) }}">
+    {{ form_widget(form._token) }}
+
+    <p class="text-muted small">{{ 'label.noindex'|trans({}, d) }}</p>
+
+    <div class="mb-3">
+        <label class="form-label" for="seone-canonical">{{ "Surcharge de l'url canonique"|trans({}, d) }}</label>
+        <input type="text" id="seone-canonical" name="canonical" value="{{ canonical|default('') }}" class="form-control" placeholder="https://…">
+    </div>
+
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="1" id="seone-noindex"
+               name="{{ field_name(form.noindex_checkbox) }}"{% if values.noindex|default(0) == 1 %} checked{% endif %}>
+        <label class="form-check-label" for="seone-noindex">{{ 'noindex'|trans({}, d) }}</label>
+    </div>
+    <div class="form-check mb-2">
+        <input class="form-check-input" type="checkbox" value="1" id="seone-nofollow"
+               name="{{ field_name(form.nofollow_checkbox) }}"{% if values.nofollow|default(0) == 1 %} checked{% endif %}>
+        <label class="form-check-label" for="seone-nofollow">{{ 'nofollow'|trans({}, d) }}</label>
+    </div>
+    <p class="text-muted small">{{ 'noindex_nofollow.help'|trans({}, d) }}</p>
+
+    <div class="mb-3">
+        <label class="form-label" for="seone-h1">{{ 'h1'|trans({}, d) }}</label>
+        <input type="text" id="seone-h1" name="{{ field_name(form.h1) }}" value="{{ values.h1|default('') }}" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" for="seone-json">{{ 'JSON structured data'|trans({}, d) }}</label>
+        <textarea id="seone-json" name="{{ field_name(form.json_data) }}" rows="6" class="form-control font-monospace">{{ values.json_data|default('') }}</textarea>
+    </div>
+
+    <h4 class="h6 mt-4">{{ 'Mesh'|trans({}, d) }}</h4>
+    <div class="table-responsive mb-3">
+        <table class="table table-sm align-middle">
+            <thead class="table-light">
+                <tr>
+                    {% for i in 1..5 %}<th>{{ 'Text'|trans({}, d) }} {{ i }}</th>{% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    {% for i in 1..5 %}
+                        <td><input type="text" class="form-control form-control-sm"
+                                   name="{{ field_name(attribute(form, 'mesh_' ~ i)) }}"
+                                   value="{{ values['mesh_' ~ i]|default('') }}"></td>
+                    {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h4 class="h6 mt-4">{{ 'Mesh links'|trans({}, d) }}</h4>
+    <div class="table-responsive mb-3">
+        <table class="table table-sm align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th style="width:1%"></th>
+                    <th>{{ 'Link text'|trans({}, d) }}</th>
+                    <th>{{ 'Link URL'|trans({}, d) }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in 1..5 %}
+                    <tr>
+                        <td class="text-nowrap">{{ 'Link'|trans({}, d) }} {{ i }}</td>
+                        <td><input type="text" class="form-control form-control-sm"
+                                   name="{{ field_name(attribute(form, 'mesh_text_' ~ i)) }}"
+                                   value="{{ values['mesh_text_' ~ i]|default('') }}"></td>
+                        <td><input type="url" class="form-control form-control-sm"
+                                   name="{{ field_name(attribute(form, 'mesh_url_' ~ i)) }}"
+                                   value="{{ values['mesh_url_' ~ i]|default('') }}"></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        <i class="bi bi-check2" aria-hidden="true"></i> {{ 'Save'|trans({}, d) }}
+    </button>
+</form>

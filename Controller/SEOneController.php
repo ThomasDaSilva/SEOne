@@ -16,11 +16,13 @@ use Propel\Runtime\Exception\PropelException;
 use SEOne\Form\SeoForm;
 use SEOne\Model\Seone;
 use SEOne\Model\SeoneQuery;
+use SEOne\SEOne as SEOneModule;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Model\LangQuery;
+use Thelia\Model\MetaDataQuery;
 use Thelia\Tools\URL;
 
 #[Route('/admin/module/seone/seo', name: 'seone_seo', methods: 'POST')]
@@ -67,6 +69,24 @@ class SEOneController extends BaseAdminController
         }
 
         $objectSeo->save();
+
+        // Canonical URL override is stored as per-locale metadata (same storage the front and the
+        // legacy SeoFormListener use), saved here so the whole SEO block has a single Save button.
+        $canonicalMetaData = MetaDataQuery::create()
+            ->filterByMetaKey(SEOneModule::SEO_CANONICAL_META_KEY)
+            ->filterByElementKey($object_type)
+            ->filterByElementId($object_id)
+            ->findOneOrCreate();
+
+        $canonicalValues = $canonicalMetaData->isNew()
+            ? []
+            : (json_decode((string) $canonicalMetaData->getValue(), true) ?: []);
+        $canonicalValues[$lang->getLocale()] = (string) $request->request->get('canonical', '');
+
+        $canonicalMetaData
+            ->setIsSerialized(0)
+            ->setValue(json_encode($canonicalValues))
+            ->save();
 
         return $this->generateRedirect(
             URL::getInstance()->absoluteUrl(
