@@ -33,6 +33,11 @@ trait SeoneBreadcrumbTrait
         $this->dispatcher = $dispatcher;
     }
 
+    private function getStoreMicroData(): array
+    {
+        return [];
+    }
+
     private function getScriptsTag($microdata, ?string $defaultType, $objectId = null): string
     {
         $scriptsTag = '';
