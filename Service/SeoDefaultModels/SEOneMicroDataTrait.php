@@ -18,6 +18,7 @@ use SEOne\Event\SEOneStoreMicroDataEvent;
 use SEOne\Event\SEOneStoreMicroDataEvents;
 use SEOne\Model\Map\SeoneI18nTableMap;
 use SEOne\Model\SeoneQuery;
+use SEOne\SEOne;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CountryQuery;
