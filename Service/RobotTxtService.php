@@ -17,6 +17,7 @@ namespace SEOne\Service;
 use Propel\Runtime\ActiveQuery\Criteria;
 use SEOne\Model\Robots;
 use SEOne\Model\RobotsQuery;
+use SEOne\SEOne;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
 use Thelia\Model\Map\LangTableMap;
@@ -29,6 +30,24 @@ class RobotTxtService
     public function __construct()
     {
         $this->isUniqueDomain = (bool)ConfigQuery::read('one_domain_foreach_lang');
+    }
+
+    /**
+     * Seed a default robots.txt for every domain that does not have one yet.
+     * Existing rows are left untouched.
+     */
+    public function initializeDefaultRobots(): void
+    {
+        foreach ($this->getDomains() as $domainName) {
+            if (RobotsQuery::create()->filterByDomainName($domainName)->findOne() !== null) {
+                continue;
+            }
+
+            (new Robots())
+                ->setDomainName($domainName)
+                ->setRobotsContent(SEOne::getDefaultRobotsContent($domainName))
+                ->save();
+        }
     }
 
     public function saveRobotTxtByDomain(string $domainName, string $robotContent): void

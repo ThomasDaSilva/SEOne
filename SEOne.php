@@ -13,6 +13,7 @@
 namespace SEOne;
 
 use Propel\Runtime\Connection\ConnectionInterface;
+use SEOne\Service\RobotTxtService;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
 use Thelia\Core\Install\Database;
 use Thelia\Module\BaseModule;
@@ -30,6 +31,32 @@ class SEOne extends BaseModule
             $database->insertSql(null, [__DIR__.'/Config/TheliaMain.sql']);
             self::setConfigValue('is_initialized', 1);
         }
+
+        // Seed a sensible robots.txt for every domain so the administrator does
+        // not have to write one by hand (and no longer has to delete a stray
+        // robots file from the front template).
+        (new RobotTxtService())->initializeDefaultRobots();
+    }
+
+    /**
+     * Default robots.txt content seeded on activation.
+     *
+     * The admin area is intentionally NOT disallowed here: with the
+     * BackOfficePath module the admin lives behind an obfuscated prefix, so a
+     * "Disallow: /admin" line is both useless and a path-disclosure risk — and
+     * it is the very line BackOfficePath rewrites on every save, which made the
+     * stored value grow by one prefix on each edit.
+     */
+    public static function getDefaultRobotsContent(string $domainName): string
+    {
+        return <<<ROBOTS
+            # robots.txt
+            User-agent: *
+            Disallow: /cart
+            Disallow: /404
+
+            Sitemap: {$domainName}/sitemap
+            ROBOTS;
     }
 
     public static function configureServices(ServicesConfigurator $servicesConfigurator): void

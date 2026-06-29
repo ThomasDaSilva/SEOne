@@ -7,6 +7,7 @@ use SEOne\Form\EditRobotTxtForm;
 use SEOne\Form\StoreSeoForm;
 use SEOne\Model\Robots;
 use SEOne\Model\RobotsQuery;
+use SEOne\SEOne;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Form\TheliaFormFactory;
@@ -76,9 +77,10 @@ class ConfigurationHook extends BaseHook
 
         if (0 >= $robots->count()) {
             if (!ConfigQuery::read('one_domain_foreach_lang')) {
+                $domain = URL::getInstance()->getBaseUrl();
                 $robot = (new Robots())
-                    ->setDomainName(URL::getInstance()->getBaseUrl())
-                    ->setRobotsContent('');
+                    ->setDomainName($domain)
+                    ->setRobotsContent(SEOne::getDefaultRobotsContent($domain));
                 $robot->save();
                 $robots[] = $robot;
             } else {
@@ -87,7 +89,7 @@ class ConfigurationHook extends BaseHook
                     if ($url = $lang->getUrl()) {
                         $robot = (new Robots())
                             ->setDomainName($url)
-                            ->setRobotsContent('');
+                            ->setRobotsContent(SEOne::getDefaultRobotsContent($url));
                         $robot->save();
                         $robots[] = $robot;
                     }
